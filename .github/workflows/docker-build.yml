@@ -15,10 +15,16 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - name: Get the version
+      - name: Get current repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: build
+
+      - name: Get the version of mem0 to build
         id: vars
         run: |
-          echo "tag=$(cat release-versions/mem0-latest.txt)" >> $GITHUB_OUTPUT
+          echo "tag=$(cat build/release-versions/mem0-latest.txt)" >> $GITHUB_OUTPUT
 
       - name: Checkout mem0 repository
         uses: actions/checkout@v4
