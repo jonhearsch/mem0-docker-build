@@ -1,0 +1,50 @@
+name: Check for new releases
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # once a day at midnight UTC
+  workflow_dispatch:
+
+env:
+  RELEASE_FILE: release-versions/mem0-latest.txt
+
+jobs:
+  get-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout (sparse, minimal)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: release-versions/
+          sparse-checkout-cone-mode: false
+
+      - name: Ensure release-versions directory exists
+        run: mkdir -p release-versions
+
+      - name: Fetch latest n8n release version
+        id: fetch-version
+        run: |
+          set -e
+          release=$(curl --silent --fail --max-time 10 --connect-timeout 5 "https://api.github.com/repos/mem0ai/mem0/releases/latest")
+          version=$(echo "$release" | grep '"tag_name":' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          if [ -z "$version" ]; then
+            echo "Failed to fetch version. API response:"
+            echo "$release"
+            exit 1
+          fi
+          echo "$version" > $RELEASE_FILE
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Check if version file changed
+        id: diff
+        run: |
+          git diff --exit-code $RELEASE_FILE || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push if changed
+        if: steps.diff.outputs.changed == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: New auto release v${{ steps.fetch-version.outputs.version }}
+          file_pattern: ${{ env.RELEASE_FILE }}
