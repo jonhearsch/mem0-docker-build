@@ -31,7 +31,7 @@ jobs:
         with:
           repository: mem0ai/mem0
           path: mem0
-          ref: v${{ steps.vars.outputs.tag }}
+          # ref: v${{ steps.vars.outputs.tag }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
