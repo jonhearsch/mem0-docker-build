@@ -1,12 +1,11 @@
-
 name: Build and Push mem0 Docker Images
 
 on:
-  push:
-    branches:
-      - main
-  schedule:
-    - cron: '0 0 * * *' # Runs daily at midnight
+  # push:
+  #   branches:
+  #     - main
+  # schedule:
+  #   # - cron: '0 0 * * *' # Runs daily at midnight
   workflow_dispatch:
 
 jobs:
