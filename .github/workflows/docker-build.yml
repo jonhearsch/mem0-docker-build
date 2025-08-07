@@ -23,7 +23,7 @@ jobs:
       - name: Checkout mem0 repository
         uses: actions/checkout@v4
         with:
-          repository: mem0/mem0
+          repository: mem0ai/mem0
           path: mem0
           ref: v${{ steps.vars.outputs.tag }}
 
